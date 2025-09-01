@@ -4,7 +4,7 @@ import { KanbanBoard, KanbanBoardContainer } from '@/components/tasks/kanban/boa
 import { ProjectCardMemo, ProjectCardSkeleton } from '@/components/tasks/kanban/card'
 import KanbanColumn, { KanbanColumnSkeleton } from '@/components/tasks/kanban/column'
 import KanbanItem from '@/components/tasks/kanban/item'
-import { TasksQuery } from '@/graphql/mutations'
+import { TasksQuery, TaskStagesQuery } from '@/graphql/types'
 import { DragEndEvent } from '@dnd-kit/core'
 import { useList, useNavigation, useUpdate } from '@refinedev/core'
 import { GetFieldsFromList } from '@refinedev/nestjs-query'
@@ -46,11 +46,11 @@ const TaskList = ({ children }: React.PropsWithChildren) => {
             return { unassignedStage: [], columns: [] }
         }
 
-        const unassignedStage = tasks.data.filter((task) => task.stageId === null)
+        const unassignedStage = tasks.data.filter((task: Task) => task.stageId === null)
 
         const grouped: TaskStage[] = stages.data.map((stage) => ({
             ...stage,
-            tasks: tasks.data.filter((task) => task.stageId?.toString() === stage.id)
+            tasks: tasks.data.filter((task: Task) => task.stageId?.toString() === stage.id)
         }))
 
         return { unassignedStage, columns: grouped }
@@ -104,7 +104,7 @@ const TaskList = ({ children }: React.PropsWithChildren) => {
                         count={taskStages.unassignedStage?.length || 0}
                         onAddClick={() => handleAddCard({ stageId: 'unassigned' })}
                     >
-                        {taskStages?.unassignedStage?.map((task) => (
+                        {taskStages?.unassignedStage?.map((task: Task) => (
                             <KanbanItem key={task.id} id={task.id} data={{ ...task, stageId: 'unassigned' }}>
                                 <ProjectCardMemo
                                     {...task}
@@ -124,7 +124,7 @@ const TaskList = ({ children }: React.PropsWithChildren) => {
                             title={column.title}
                             count={column.tasks.length}
                             onAddClick={() => handleAddCard({ stageId: column.id })}>
-                            {!isLoading && column.tasks.map((task) => {
+                            {!isLoading && column.tasks.map((task: Task) => {
                                 console.log('Rendering task:', task)
                                 return (
                                     <KanbanItem key={task.id} id={task.id} data={task}>

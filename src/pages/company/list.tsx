@@ -12,6 +12,9 @@ import CustomAvatar from '@/components/custom-avatar';
 import { Company } from '@/graphql/schema.types';
 import { currencyNumber } from '@/utilities';
 import { useState } from 'react';
+import { GetFieldsFromList } from '@refinedev/nestjs-query';
+import { HttpError } from "@refinedev/core";
+import { CompaniesListQuery } from '@/graphql/types';
 
 const CompanyList = ({ children }: React.PropsWithChildren) => {
   const go = useGo();
@@ -87,7 +90,7 @@ const CompanyList = ({ children }: React.PropsWithChildren) => {
           />
         </div>
 
-        <Table
+        <Table<Company>
           dataSource={companies}
           rowKey="id"
           loading={isLoading}
@@ -97,38 +100,42 @@ const CompanyList = ({ children }: React.PropsWithChildren) => {
             onChange: setCurrent,
             onShowSizeChange: (_, size) => setPageSize(size),
           }}
-        >
-          <Table.Column<Company>
-            dataIndex="name"
-            title="Company Title"
-            render={(value, record) => (
-              <Space>
-                <CustomAvatar shape="square" name={record.name} src={record.avatarUrl} />
-                <Typography.Text style={{ whiteSpace: 'nowrap' }}>{record.name}</Typography.Text>
-              </Space>
-            )}
-          />
-          <Table.Column<Company>
-            dataIndex="totalRevenue"
-            title="Open deals amount"
-            render={(value, company) => (
-              <Typography.Text>
-                {currencyNumber(company?.dealsAggregate?.[0].sum?.value || 0)}
-              </Typography.Text>
-            )}
-          />
-          <Table.Column<Company>
-            dataIndex="id"
-            title="Actions"
-            fixed="right"
-            render={(value) => (
-              <Space>
-                <EditButton hideText size="small" recordItemId={value} />
-                <DeleteButton hideText size="small" recordItemId={value} />
-              </Space>
-            )}
-          />
-        </Table>
+          columns={[
+            {
+              dataIndex: "name",
+              title: "Company Title",
+              render: (_: unknown, record: Company) => (
+                <Space>
+                  <CustomAvatar shape="square" name={record.name} src={record.avatarUrl} />
+                  <Typography.Text style={{ whiteSpace: "nowrap" }}>
+                    {record.name}
+                  </Typography.Text>
+                </Space>
+              ),
+            },
+            {
+              dataIndex: "totalRevenue",
+              title: "Open deals amount",
+              render: (_: unknown, company: Company) => (
+                <Typography.Text>
+                  {currencyNumber(company?.dealsAggregate?.[0].sum?.value || 0)}
+                </Typography.Text>
+              ),
+            },
+            {
+              dataIndex: "id",
+              title: "Actions",
+              fixed: "right",
+              render: (value: string) => (
+                <Space>
+                  <EditButton hideText size="small" recordItemId={value} />
+                  <DeleteButton hideText size="small" recordItemId={value} />
+                </Space>
+              ),
+            },
+          ]}
+        />
+
       </List>
       {children}
     </div>
