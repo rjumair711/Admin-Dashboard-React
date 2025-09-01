@@ -24,7 +24,7 @@ const CompanyList = ({ children }: React.PropsWithChildren) => {
     setCurrent,
     setPageSize,
     setFilters,
-  } = useTable({
+  } = useTable<GetFieldsFromList<CompaniesListQuery>, HttpError, GetFieldsFromList<CompaniesListQuery>>({
     resource: 'companies',
     pagination: {
       pageSize: 12,
